@@ -1,6 +1,7 @@
 import os
 import shutil
 import logging
+import pathlib
 from resources.QBitController import QBitController
 import resources.Helper as Helper
 
@@ -58,7 +59,25 @@ class CategoryProfile:
             return
 
         if self.should_torrent_be_deleted(torrent['hash']):
-            self.torrents_to_delete[torrent['hash']] = torrent['name']
+            content_path = torrent['content_path']
+            save_path = torrent['save_path']
+
+            if not content_path.startswith(save_path):
+                print("content_path did not begin with save_path for torrent: " + torrent['name'])
+                print("content_path: " + content_path)
+                print("save_path: " + save_path)
+                return
+
+            torrent_path = content_path[len(save_path):]
+            torrent_path = pathlib.PurePath(torrent_path.strip("/"))
+
+            if not torrent_path or len(torrent_path.parts) == 0 or not torrent_path.parts[0]:
+                print("Could not create a safe torrent_path for torrent: " + torrent['name'])
+                print("content_path: " + content_path)
+                print("save_path: " + save_path)
+                print("torrent_path: " + torrent_path)
+                return
+            self.torrents_to_delete[torrent['hash']] = torrent_path.parts[0]
 
 
     def delete_torrents_to_be_deleted(self):
