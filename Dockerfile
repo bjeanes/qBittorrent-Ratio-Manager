@@ -4,7 +4,7 @@ COPY ./ /app
 
 WORKDIR /app
 
-RUN pip3 install jsonschema requests
+RUN apk add cargo && pip install jsonschema requests
 
 ENV QBIT_URL="http://127.0.0.1:8080/api/v2/" \
     QBIT_USERNAME="" \
